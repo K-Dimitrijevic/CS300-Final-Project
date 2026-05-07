@@ -211,6 +211,7 @@ const Dashboard = ({ datasets, onSaveDataset }) => {
                 data={filteredData}
                 xField={safeXField}
                 yField={safeYField}
+                yField2={safeYField2}
                 chartType={effectiveChartType}
                 regressionLine={regressionLine}
                 showRegression={showRegression}
