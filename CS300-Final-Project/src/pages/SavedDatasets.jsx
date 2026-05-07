@@ -4,7 +4,7 @@ import Card from "../components/Card";
 import EmptyState from "../components/EmptyState";
 import PageHeader from "../components/PageHeader";
 
-const SavedDatasets = ({ datasets, onDeleteDataset }) => (
+const SavedDatasets = ({ datasets = [], onDeleteDataset }) => (
   <div className="page">
     <PageHeader
       title="Saved Datasets"
@@ -25,7 +25,10 @@ const SavedDatasets = ({ datasets, onDeleteDataset }) => (
           title={dataset.name}
           subtitle={`Created ${new Date(dataset.createdAt).toLocaleString()}`}
         >
-          <p>{dataset.data.length} rows · {dataset.fields.length} fields</p>
+          <p>
+            {(dataset.data?.length ?? 0)} rows ·
+            {(dataset.fields?.length ?? 0)} fields
+          </p>
           <div className="button-row">
             <NavLink to={`/dataset/${dataset.id}`}>
               <Button variant="ghost">View details</Button>

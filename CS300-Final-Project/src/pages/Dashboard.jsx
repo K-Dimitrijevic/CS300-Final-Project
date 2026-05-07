@@ -2,6 +2,7 @@ import { useState } from "react";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import ChartContainer from "../components/ChartContainer";
+import DatasetInsights from "../components/DatasetInsights";
 import DatasetStats from "../components/DatasetStats";
 import DatasetTable from "../components/DatasetTable";
 import EmptyState from "../components/EmptyState";
@@ -9,8 +10,13 @@ import ErrorAlert from "../components/ErrorAlert";
 import LoadingSpinner from "../components/LoadingSpinner";
 import PageHeader from "../components/PageHeader";
 import SelectField from "../components/SelectField";
+import useChartConfig from "../hooks/useChartConfig";
 import useFetchDataset from "../hooks/useFetchDataset";
-import { calculateStats, filterData, getFields, sortData } from "../utils/dataUtils";
+import {
+  calculateStats,
+  getFields,
+  getNumericFields,
+} from "../utils/dataUtils";
 
 const Dashboard = ({ datasets, onSaveDataset }) => {
   const { data: apiData, loading, error, refetch } = useFetchDataset();
@@ -18,6 +24,7 @@ const Dashboard = ({ datasets, onSaveDataset }) => {
   const [chartType, setChartType] = useState("bar");
   const [xField, setXField] = useState("");
   const [yField, setYField] = useState("");
+  const [yField2, setYField2] = useState("");
   const [filterQuery, setFilterQuery] = useState("");
   const [sortField, setSortField] = useState("");
   const [sortDirection, setSortDirection] = useState("asc");
@@ -31,19 +38,36 @@ const Dashboard = ({ datasets, onSaveDataset }) => {
       }
     : datasets.find((dataset) => dataset.id === selectedId) || null;
 
+  const rawData = Array.isArray(activeDataset?.data) ? activeDataset.data : [];
   const fields = activeDataset?.fields?.length
     ? activeDataset.fields
-    : getFields(activeDataset?.data || []);
+    : getFields(rawData);
+  const numericFields = getNumericFields(rawData);
+  const numericOptions = numericFields.length
+    ? numericFields.map((field) => ({ value: field, label: field }))
+    : [{ value: "", label: "No numeric fields" }];
 
-  const safeXField = fields.includes(xField) ? xField : fields[0] || "";
-  const safeYField = fields.includes(yField) ? yField : fields[1] || fields[0] || "";
-
-  const baseData = activeDataset?.data || [];
-  const filteredData = sortData(
-    filterData(baseData, filterQuery),
+  const safeYField2 = numericFields.includes(yField2) ? yField2 : "";
+  const {
+    safeXField,
+    safeYField,
+    filteredData,
+    effectiveChartType,
+    regressionLine,
+    showRegression,
+    regressionMessage,
+    chartNote,
+  } = useChartConfig({
+    data: rawData,
+    fields,
+    numericFields,
+    chartType,
+    xField,
+    yField,
+    filterQuery,
     sortField,
-    sortDirection
-  );
+    sortDirection,
+  });
   const stats = calculateStats(filteredData, safeYField);
 
   const handleSaveApi = () => {
@@ -110,6 +134,7 @@ const Dashboard = ({ datasets, onSaveDataset }) => {
               { value: "line", label: "Line chart" },
               { value: "area", label: "Area chart" },
               { value: "pie", label: "Pie chart" },
+              { value: "scatter", label: "Scatter plot" },
             ]}
           />
           <SelectField
@@ -142,7 +167,16 @@ const Dashboard = ({ datasets, onSaveDataset }) => {
             label="Y-axis"
             value={safeYField}
             onChange={setYField}
-            options={fields.map((field) => ({ value: field, label: field }))}
+            options={numericOptions}
+          />
+          <SelectField
+            label="Compare field"
+            value={safeYField2}
+            onChange={setYField2}
+            options={[
+              { value: "", label: "Optional" },
+              ...numericOptions,
+            ]}
           />
           <label className="field">
             <span>Filter rows</span>
@@ -163,20 +197,50 @@ const Dashboard = ({ datasets, onSaveDataset }) => {
       )}
 
       {activeDataset && (
-        <div className="grid grid--two">
-          <Card title="Chart preview" subtitle={activeDataset.name}>
-            <ChartContainer
-              data={filteredData}
-              xField={safeXField}
-              yField={safeYField}
-              chartType={chartType}
-            />
-          </Card>
-          <Card title="Statistics" subtitle={`Field: ${safeYField || "-"}`}>
-            <DatasetStats stats={stats} />
-            <DatasetTable data={filteredData} fields={fields} />
-          </Card>
-        </div>
+        <>
+          <div className="grid grid--two">
+            <Card title="Chart preview" subtitle={activeDataset.name}>
+              {chartNote && <p className="chart-note">{chartNote}</p>}
+              {regressionMessage && (
+                <p className="chart-note chart-note--warning">
+                  {regressionMessage}
+                </p>
+              )}
+              <ChartContainer
+                data={filteredData}
+                xField={safeXField}
+                yField={safeYField}
+                chartType={effectiveChartType}
+                regressionLine={regressionLine}
+                showRegression={showRegression}
+              />
+              {showRegression && regressionLine && (
+                <div className="chart-meta">
+                  <span>
+                    y = {regressionLine.slope.toFixed(4)}x +
+                    {regressionLine.intercept.toFixed(4)}
+                  </span>
+                  {regressionLine.r2 !== null && (
+                    <span>R² = {regressionLine.r2.toFixed(4)}</span>
+                  )}
+                </div>
+              )}
+            </Card>
+            <Card title="Statistics" subtitle={`Field: ${safeYField || "-"}`}>
+              <DatasetStats stats={stats} />
+              <DatasetTable data={filteredData} fields={fields} />
+            </Card>
+          </div>
+          <DatasetInsights
+            data={filteredData}
+            datasetName={activeDataset.name}
+            xField={safeXField}
+            yField={safeYField}
+            yField2={safeYField2}
+            loading={loading && selectedId === "api"}
+            error={selectedId === "api" ? error : null}
+          />
+        </>
       )}
     </div>
   );

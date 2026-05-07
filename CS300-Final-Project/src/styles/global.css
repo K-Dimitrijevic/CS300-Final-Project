@@ -200,6 +200,7 @@ a {
   font-size: 14px;
 }
 
+
 .field small,
 .helper {
   color: #64748b;
@@ -214,6 +215,10 @@ a {
   border-radius: 12px;
 }
 
+.stats div {
+  min-width: 0;
+}
+
 .stats span {
   display: block;
   font-size: 12px;
@@ -222,12 +227,20 @@ a {
 
 .stats strong {
   font-size: 18px;
+  word-break: break-word;
 }
 
 .table table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+}
+
+.table__scroll {
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
 }
 
 .table th,
@@ -243,10 +256,113 @@ a {
   margin-top: 8px;
 }
 
+.table__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.table__button {
+  border: 1px solid #cbd5f5;
+  background: #fff;
+  color: #1e293b;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.insights__intro {
+  display: grid;
+  gap: 12px;
+  color: #475569;
+  font-size: 14px;
+}
+
+.insights__actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.insights__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.insights__item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.insights__item h4 {
+  font-size: 14px;
+}
+
+.insights__item span {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.insights__item p {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.insights__extra {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  background: #f1f5f9;
+  padding: 14px;
+  border-radius: 12px;
+}
+
+.insights__extra h4 {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
 .chart {
   width: 100%;
   height: 320px;
 }
+
+.chart-note {
+  background: #e0f2fe;
+  color: #075985;
+  border: 1px solid #bae6fd;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.chart-note--warning {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.chart-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #475569;
+}
+
 
 .empty {
   text-align: center;

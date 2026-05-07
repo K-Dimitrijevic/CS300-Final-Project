@@ -7,6 +7,7 @@ import "./styles/global.css";
 
 const App = () => {
   const [datasets, setDatasets] = useLocalStorage("vizlab-datasets", []);
+  const safeDatasets = Array.isArray(datasets) ? datasets : [];
 
   const handleSaveDataset = (dataset) => {
     setDatasets((prev) => {
@@ -28,7 +29,7 @@ const App = () => {
         <NavBar />
         <main className="content">
           <AppRoutes
-            datasets={datasets}
+            datasets={safeDatasets}
             onSaveDataset={handleSaveDataset}
             onDeleteDataset={handleDeleteDataset}
           />
