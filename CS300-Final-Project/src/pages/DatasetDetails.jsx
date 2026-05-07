@@ -38,6 +38,7 @@ const DatasetDetails = ({ datasets }) => {
     : [{ value: "", label: "No numeric fields" }];
 
   const safeYField2 = numericFields.includes(yField2) ? yField2 : "";
+  console.log("safeYField2:", safeYField2, "yField2:", yField2, "numericFields:", numericFields);
   const {
     safeXField,
     safeYField,
@@ -127,7 +128,7 @@ const DatasetDetails = ({ datasets }) => {
           />
           <SelectField
             label="Compare field"
-            value={safeYField2}
+            value={yField2}
             onChange={setYField2}
             options={[
               { value: "", label: "Optional" },
@@ -177,21 +178,12 @@ const DatasetDetails = ({ datasets }) => {
             data={filteredData}
             xField={safeXField}
             yField={safeYField}
+            yField2={safeYField2}
             chartType={effectiveChartType}
             regressionLine={regressionLine}
             showRegression={showRegression}
           />
-          {showRegression && regressionLine && (
-            <div className="chart-meta">
-              <span>
-                y = {regressionLine.slope.toFixed(4)}x +
-                {regressionLine.intercept.toFixed(4)}
-              </span>
-              {regressionLine.r2 !== null && (
-                <span>R² = {regressionLine.r2.toFixed(4)}</span>
-              )}
-            </div>
-          )}
+       
         </Card>
         <Card title="Dataset stats" subtitle={`Field: ${safeYField || "-"}`}>
           <DatasetStats stats={stats} />

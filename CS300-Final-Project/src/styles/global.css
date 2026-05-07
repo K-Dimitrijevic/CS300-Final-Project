@@ -335,9 +335,17 @@ a {
   margin-bottom: 4px;
 }
 
+/* global.css */
+.regression-stats {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #475569;
+  padding: 6px 0;
+}
+
 .chart {
   width: 100%;
-  height: 320px;
+  min-height: 320px;
 }
 
 .chart-note {

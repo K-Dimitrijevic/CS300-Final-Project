@@ -30,12 +30,9 @@ const Dashboard = ({ datasets, onSaveDataset }) => {
   const [sortDirection, setSortDirection] = useState("asc");
 
   const activeDataset = selectedId === "api"
-    ? {
-        id: "api",
-        name: "Market Snapshot (API)",
-        data: apiData,
-        fields: getFields(apiData),
-      }
+    ? (apiData.length > 0 && !loading)
+      ? { id: "api", name: "Market Snapshot (API)", data: apiData, fields: getFields(apiData) }
+      : null 
     : datasets.find((dataset) => dataset.id === selectedId) || null;
 
   const rawData = Array.isArray(activeDataset?.data) ? activeDataset.data : [];
@@ -122,9 +119,13 @@ const Dashboard = ({ datasets, onSaveDataset }) => {
           <SelectField
             label="Dataset"
             value={selectedId}
-            onChange={setSelectedId}
-            options={datasetOptions}
-          />
+            onChange={(value) => {
+              setSelectedId(value);
+              if (value === "api") refetch();
+                }}
+                options={datasetOptions}
+              />
+          
           <SelectField
             label="Chart type"
             value={chartType}
@@ -189,7 +190,7 @@ const Dashboard = ({ datasets, onSaveDataset }) => {
         </div>
       </Card>
 
-      {!activeDataset && (
+      {!activeDataset && !loading && (
         <EmptyState
           title="Choose a dataset to begin"
           description="Load a saved dataset or fetch the public API sample."
@@ -214,17 +215,7 @@ const Dashboard = ({ datasets, onSaveDataset }) => {
                 regressionLine={regressionLine}
                 showRegression={showRegression}
               />
-              {showRegression && regressionLine && (
-                <div className="chart-meta">
-                  <span>
-                    y = {regressionLine.slope.toFixed(4)}x +
-                    {regressionLine.intercept.toFixed(4)}
-                  </span>
-                  {regressionLine.r2 !== null && (
-                    <span>R² = {regressionLine.r2.toFixed(4)}</span>
-                  )}
-                </div>
-              )}
+          
             </Card>
             <Card title="Statistics" subtitle={`Field: ${safeYField || "-"}`}>
               <DatasetStats stats={stats} />

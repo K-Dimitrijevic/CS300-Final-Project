@@ -228,7 +228,7 @@ export const calculateRegressionLine = (data, xField, yField) => {
   if (!xField || !yField) return null;
   const points = getNumericPairs(data, xField, yField);
 
-  if (points.length < 3) return null;
+  if (points.length < 2) return null;
 
   const count = points.length;
   const meanX = points.reduce((sum, point) => sum + point.x, 0) / count;
